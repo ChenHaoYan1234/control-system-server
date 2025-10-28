@@ -16,4 +16,9 @@ node_modules
 #!.yarn/cache
 .pnp.*
 
+# If you use Yarn Plug'n'Play, you can safely delete this file after you've
+# installed your dependencies.
 yarn.lock
+
+# The following files are automatically generated
+dist/
