@@ -20,6 +20,7 @@
         "mongoose": "^8.19.2"
     },
     "scripts": {
-        "build": "tsc -p ./tsconfig.json "
+        "build": "tsc -p ./tsconfig.json",
+        "dev": "nodemon"
     }
 }
