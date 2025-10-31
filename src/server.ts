@@ -3,6 +3,7 @@ import bodyParser from "koa-bodyparser"
 import { createConnection, updateEnvDataModels } from "./database.ts"
 import router from "./router/index.ts"
 import { server_config } from "./config.ts"
+import cors from "@koa/cors"
 
 // 创建数据库连接
 await createConnection()
@@ -12,6 +13,12 @@ await updateEnvDataModels()
 
 // 创建 Koa 应用实例
 const app = new Koa()
+
+app.use(cors({
+    origin: "*",
+    maxAge: 3600,
+    credentials: true,
+}))
 
 // 使用 bodyParser 中间件解析请求体
 app.use(bodyParser())
