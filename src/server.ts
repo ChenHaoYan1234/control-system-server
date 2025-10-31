@@ -23,5 +23,5 @@ app.use(router.allowedMethods())
 
 // 启动服务器，监听 8080 端口
 app.listen(server_config.port, () => {
-    console.log("Server is running on http://localhost:8080.")
+    console.log(`Server is running on http://localhost:${server_config.port}.`)
 })
