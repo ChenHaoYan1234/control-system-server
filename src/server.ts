@@ -15,7 +15,7 @@ await updateEnvDataModels()
 const app = new Koa()
 
 app.use(cors({
-    origin: "*",
+    origin: server_config.client.origin,
     maxAge: 3600,
     credentials: true,
 }))
