@@ -12,11 +12,11 @@ async function envdataGet(ctx: Context, next: MiddlewareType) {
     // 打印请求日志，包含设备UUID，用于调试和监控
     console.log(`GET /envdata?deviceUUID=${ctx.query.deviceUUID}`)
     // 检查deviceUUID参数是否存在或为空，确保请求参数有效性
-    if (ctx.query.deviceUUID === undefined || ctx.query.deviceUUID === "") {
+    if (!ctx.query.deviceUUID) {
         // 如果参数无效，返回400状态码和错误信息，表示客户端请求错误
         ctx.response.status = 400
         ctx.response.body = { error: "deviceUUID is required" }
-    } else if (isAvailableDevice(ctx.query.deviceUUID as string) === false) {
+    } else if (!isAvailableDevice(ctx.query.deviceUUID as string)) {
         // 如果设备UUID不存在，返回404状态码和错误信息，表示资源未找到
         ctx.response.status = 404
         ctx.response.body = { error: "deviceUUID is not found" }
@@ -40,26 +40,32 @@ async function envdataPost(ctx: Context, next: MiddlewareType) {
     // 打印请求日志，记录POST请求到/envdata端点
     console.log(`POST /envdata`)
     // 检查deviceUUID是否存在
-    if (body.deviceUUID === undefined || body.deviceUUID === "") {
+    if (!body.deviceUUID) {
         // 如果deviceUUID不存在，返回400错误，表示请求缺少必要参数
         ctx.response.status = 400
         ctx.response.body = { error: "deviceUUID is required" }
-    } else if (isAvailableDevice(body.deviceUUID) === false) {
+    } else if (!isAvailableDevice(body.deviceUUID)) {
         // 如果deviceUUID不存在于可用设备列表中，返回404错误，表示设备未找到
         ctx.response.status = 404
         ctx.response.body = { error: "deviceUUID is not found" }
-    } else if (body.timestamp === undefined) {
+    } else if (!body.timestamp) {
         // 如果timestamp不存在，返回400错误，表示请求缺少时间戳参数
         ctx.response.status = 400
         ctx.response.body = { error: "timestamp is required" }
     } else {
         // 如果所有必要参数都存在，构建环境数据对象
         const envdata = buildEnvData(body)
-        // 将环境数据保存到数据库，使用deviceUUID关联设备
-        await createEnvData(envdata, body.deviceUUID)
-        // 返回201状态码，表示资源创建成功
-        ctx.response.status = 201
-        ctx.response.body = { message: "ok" }
+        try {
+            // 将环境数据保存到数据库，使用deviceUUID关联设备
+            await createEnvData(envdata, body.deviceUUID)
+            // 返回201状态码，表示资源创建成功
+            ctx.response.status = 201
+            ctx.response.body = { message: "ok" }
+        } catch (error) {
+            // 如果保存数据时发生错误，返回500状态码和错误信息
+            ctx.response.status = 500
+            ctx.response.body = { error: "can't create envdata" }
+        }
     }
     // 执行下一个中间件
     await next()

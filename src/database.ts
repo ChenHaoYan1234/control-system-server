@@ -10,7 +10,8 @@ import { getLastOneHour } from "./utils.ts";
 const DeviceDataSchema = new mongoose.Schema({
     deviceUUID: {
         type: "UUID",  // 设备UUID字段，类型为UUID
-        required: true  // 该字段为必填项
+        required: true,  // 该字段为必填项,
+        unique: true  // 该字段值在集合中必须唯一
     },
     deviceName: String,  // 设备名称字段，类型为字符串
 })
@@ -27,7 +28,8 @@ const EnvDataSchema = new mongoose.Schema({
     pm25: Number,
     timestamp: {
         type: Number,
-        required: true
+        required: true,
+        unique: true
     }
 }, { timestamps: true })
 
@@ -66,7 +68,7 @@ async function getDevices() {
     // 从数据库中查询所有设备数据
     const _devices = await DeviceDataModel.find({})
     // 创建一个空数组用于存储处理后的设备数据
-    const devices: Array<DeviceDataType> = []
+    const devices: DeviceDataType[] = []
     // 遍历查询到的设备数据
     _devices.forEach((item) => {
         // 创建一个新的设备对象，只包含deviceUUID
@@ -99,6 +101,18 @@ async function createDevice(device: DeviceDataType) {
 }
 
 /**
+ * 更新设备名称的异步函数
+ * @param deviceUUID 设备的唯一标识符
+ * @param deviceName 要更新的设备名称
+ */
+async function updateDeviceName(deviceUUID: string, deviceName: string) {
+    // 查找并更新设备数据，返回更新后的文档
+    const _device = await DeviceDataModel.findOneAndUpdate({ deviceUUID: deviceUUID }, { deviceName: deviceName }, { new: true })
+    // 如果找到设备，则保存更新后的设备信息
+    if (_device) await _device.save()
+}
+
+/**
  * 更新环境数据模型函数
  * 该函数会获取所有设备，并为每个设备创建对应的环境数据模型
  */
@@ -112,6 +126,11 @@ async function updateEnvDataModels() {
     })
 }
 
+/**
+ * 保存环境数据函数
+ * @param envData 环境数据
+ * @param deviceUUID 设备唯一标识符
+ */
 async function createEnvData(envData: EnvDataType, deviceUUID: string) {
     const _envData = await EnvDataModels[deviceUUID].create(envData)
     await _envData.save()
@@ -123,19 +142,19 @@ async function createEnvData(envData: EnvDataType, deviceUUID: string) {
  * @returns 返回包含过去一小时环境数据的数组
  */
 async function getLastOneHourEnvDatas(deviceUUID: string) {
-    const _envdatas: Array<EnvDataType> = await EnvDataModels[deviceUUID].find({ createdAt: { $gte: getLastOneHour() } }).sort({ createdAt: -1 })
-    const envdatas: Array<EnvDataType> = []
+    const _envdatas: EnvDataType[] = await EnvDataModels[deviceUUID].find({ createdAt: { $gte: getLastOneHour() } }).sort({ createdAt: -1 })
+    const envdatas: EnvDataType[] = []
     // 清除读取到的垃圾数据
     _envdatas.forEach(envdata => {
-            const _envdata: EnvDataType = { timestamp: envdata.timestamp }
-            if (envdata.temperature !== undefined)
-                _envdata.temperature = envdata.temperature
-            if (envdata.humidity !== undefined)
-                _envdata.humidity = envdata.humidity
-            if (envdata.pm25 !== undefined)
-                _envdata.pm25 = envdata.pm25
-            envdatas.push(_envdata)
-        });
+        const _envdata: EnvDataType = { timestamp: envdata.timestamp }
+        if (envdata.temperature !== undefined && envdata.temperature !== null)
+            _envdata.temperature = envdata.temperature
+        if (envdata.humidity !== undefined && envdata.humidity !== null)
+            _envdata.humidity = envdata.humidity
+        if (envdata.pm25 !== undefined && envdata.pm25 !== null)
+            _envdata.pm25 = envdata.pm25
+        envdatas.push(_envdata)
+    });
     return envdatas
 }
 
@@ -149,4 +168,4 @@ function isAvailableDevice(deviceUUID: string) {
     return EnvDataModels[deviceUUID] ? true : false
 }
 
-export { createConnection, updateEnvDataModels, createDevice, createEnvData, getLastOneHourEnvDatas, isAvailableDevice, getDevices, closeConnection }
+export { createConnection, updateEnvDataModels, createDevice, createEnvData, getLastOneHourEnvDatas, isAvailableDevice, getDevices, closeConnection, updateDeviceName }
