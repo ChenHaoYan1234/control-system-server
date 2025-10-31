@@ -1,5 +1,5 @@
-import type { EnvDataPostBody } from "./router/type.js";
-import type { EnvDataType } from "./type.js";
+import type { EnvDataPostBody } from "./router/type.d.ts";
+import type { EnvDataType } from "./type.d.ts";
 
 /**
  * 获取当前时间前一小时的时间

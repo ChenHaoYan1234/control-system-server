@@ -1,5 +1,5 @@
 import type { Context } from "koa"
-import type { MiddlewareType, EnvDataPostBody } from "./type.js"
+import type { MiddlewareType, EnvDataPostBody } from "./type.d.ts"
 import { createEnvData, getLastOneHourEnvDatas, isAvailableDevice } from "../database.ts"
 import { buildEnvData } from "../utils.ts"
 

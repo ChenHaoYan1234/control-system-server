@@ -1,5 +1,5 @@
 import type { Context } from "koa";
-import type { DeviceDataPostBody, MiddlewareType } from "./type.js";
+import type { DeviceDataPostBody, MiddlewareType } from "./type.d.ts";
 import { createDevice, getDevices } from "../database.ts";
 
 /**
