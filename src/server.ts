@@ -2,6 +2,7 @@ import Koa from "koa"
 import bodyParser from "koa-bodyparser"
 import { createConnection, updateEnvDataModels } from "./database.ts"
 import router from "./router/index.ts"
+import { server_config } from "./config.ts"
 
 // 创建数据库连接
 await createConnection()
@@ -21,6 +22,6 @@ app.use(router.routes())
 app.use(router.allowedMethods())
 
 // 启动服务器，监听 8080 端口
-app.listen(8080, () => {
+app.listen(server_config.port, () => {
     console.log("Server is running on http://localhost:8080.")
 })

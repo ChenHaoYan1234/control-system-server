@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { mongoDB } from "./config.ts";
+import { mongoDB_config } from "./config.ts";
 import type { DeviceDataType, EnvDataModelsType, EnvDataType } from "./type.d.ts";
 import { getLastOneHour } from "./utils.ts";
 
@@ -42,15 +42,15 @@ let EnvDataModels: EnvDataModelsType = {}
 async function createConnection() {
     // 使用mongoose的connect方法建立连接
     // 传入数据库URL和认证信息
-    await mongoose.connect(mongoDB.url, {
+    await mongoose.connect(mongoDB_config.url, {
         // 数据库用户名
-        user: mongoDB.user,
+        user: mongoDB_config.user,
         // 数据库密码
-        pass: mongoDB.password,
+        pass: mongoDB_config.password,
         // 要连接的数据库名称
-        dbName: mongoDB.dbName,
+        dbName: mongoDB_config.dbName,
         // 指定MongoDB认证的数据库来源
-        authSource: mongoDB.authSource,
+        authSource: mongoDB_config.authSource,
     })
 }
 
