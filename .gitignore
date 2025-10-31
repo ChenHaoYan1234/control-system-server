@@ -22,3 +22,5 @@ yarn.lock
 
 # The following files are automatically generated
 dist/
+
+src/config.ts
