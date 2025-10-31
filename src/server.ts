@@ -1,5 +1,5 @@
 import Koa from "koa"
-import bodyParser from "koa-bodyparser"
+import bodyParser from "@koa/bodyparser"
 import { createConnection, updateEnvDataModels } from "./database.ts"
 import router from "./router/index.ts"
 import { server_config } from "./config.ts"

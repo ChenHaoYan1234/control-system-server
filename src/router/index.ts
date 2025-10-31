@@ -1,4 +1,4 @@
-import Router from "koa-router"
+import Router from "@koa/router"
 import { envdataGet, envdataPost } from "./envdata.ts"
 import { deviceGet, devicePost, devicePut } from "./device.ts"
 

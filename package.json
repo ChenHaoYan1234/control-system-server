@@ -5,10 +5,8 @@
     "devDependencies": {
         "@eslint/js": "^9.38.0",
         "@types/koa": "^3",
-        "@types/koa-bodyparser": "^4.3.13",
-        "@types/koa-cors": "^0",
-        "@types/koa-router": "^7.4.9",
         "@types/koa__cors": "^5",
+        "@types/koa__router": "^12.0.5",
         "@types/node": "^24.9.1",
         "eslint": "^9.38.0",
         "globals": "^16.4.0",
@@ -19,10 +17,10 @@
         "typescript-eslint": "^8.46.2"
     },
     "dependencies": {
+        "@koa/bodyparser": "^6.0.0",
         "@koa/cors": "^5.0.0",
+        "@koa/router": "^14.0.0",
         "koa": "^3.1.1",
-        "koa-bodyparser": "^4.4.1",
-        "koa-router": "^14.0.0",
         "mongoose": "^8.19.2"
     },
     "scripts": {
