@@ -1,6 +1,6 @@
 import type { Context } from "koa";
 import type { DeviceDataGetResponse, DeviceDataPostBody, DeviceDataPutBody, MiddlewareType } from "./type.d.ts";
-import { createDevice, getDevices, isAvailableDevice, updateDeviceName, updateEnvDataModels } from "../database.ts";
+import { createDevice, getDeviceNameByUUID, getDevices, isAvailableDevice, updateDeviceName } from "../database.ts";
 
 /**
  * 处理获取设备列表的异步中间件函数
@@ -22,6 +22,31 @@ async function deviceGet(ctx: Context, next: MiddlewareType) {
 
     ctx.response.body = devices  // 将设备列表设置为响应体
     await next()  // 执行下一个中间件
+}
+
+async function deviceNameGet(ctx: Context, next: MiddlewareType) {
+    console.log(`GET /device/${ctx.params.deviceUUID}`)
+    if (!isAvailableDevice(ctx.params.deviceUUID)) {
+        ctx.response.status = 404
+        ctx.response.body = {
+            message: "deviceUUID not found"
+        }
+    } else {
+        const device = await getDeviceNameByUUID(ctx.params.deviceUUID)
+        if (!device) {
+            ctx.response.status = 404
+            ctx.response.body = {
+                message: "deviceUUID not found"
+            }
+        } else {
+            ctx.response.status = 200
+            ctx.response.body = {
+                deviceUUID: device.deviceUUID,
+                deviceName: device.deviceName ? device.deviceName : device.deviceUUID
+            }
+        }
+    }
+    await next()
 }
 
 /**
@@ -78,13 +103,13 @@ async function devicePut(ctx: Context, next: MiddlewareType) {
         ctx.response.body = {
             message: "deviceUUID or deviceName are required"
         }
-    }else if (!isAvailableDevice(body.deviceUUID)) {
+    } else if (!isAvailableDevice(body.deviceUUID)) {
         // 检查设备UUID是否存在，如果不存在则返回404状态码和错误信息
         ctx.response.status = 404
         ctx.response.body = {
             message: "deviceUUID not found"
         }
-    }else{
+    } else {
         // 如果参数有效且设备存在，则更新设备名称
         await updateDeviceName(body.deviceUUID, body.deviceName)
         // 返回200状态码，表示设备名称更新成功
@@ -98,4 +123,4 @@ async function devicePut(ctx: Context, next: MiddlewareType) {
     await next()
 }
 
-export { deviceGet, devicePost, devicePut }
+export { deviceGet, devicePost, devicePut, deviceNameGet }

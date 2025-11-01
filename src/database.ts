@@ -112,6 +112,11 @@ async function updateDeviceName(deviceUUID: string, deviceName: string) {
     if (_device) await _device.save()
 }
 
+async function getDeviceNameByUUID(deviceUUID: string) {
+    const _device = await DeviceDataModel.findOne({ deviceUUID: deviceUUID })
+    if (_device) return { deviceName: _device.deviceName, deviceUUID: _device.deviceUUID.toString() }
+}
+
 /**
  * 更新环境数据模型函数
  * 该函数会获取所有设备，并为每个设备创建对应的环境数据模型
@@ -168,4 +173,4 @@ function isAvailableDevice(deviceUUID: string) {
     return EnvDataModels[deviceUUID] ? true : false
 }
 
-export { createConnection, updateEnvDataModels, createDevice, createEnvData, getLastOneHourEnvDatas, isAvailableDevice, getDevices, closeConnection, updateDeviceName }
+export { createConnection, updateEnvDataModels, createDevice, createEnvData, getLastOneHourEnvDatas, isAvailableDevice, getDevices, closeConnection, updateDeviceName, getDeviceNameByUUID }

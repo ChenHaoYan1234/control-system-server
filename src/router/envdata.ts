@@ -61,7 +61,7 @@ async function envdataPost(ctx: Context, next: MiddlewareType) {
             // 返回201状态码，表示资源创建成功
             ctx.response.status = 201
             ctx.response.body = { message: "ok" }
-        } catch (error) {
+        } catch {
             // 如果保存数据时发生错误，返回500状态码和错误信息
             ctx.response.status = 500
             ctx.response.body = { error: "can't create envdata" }
