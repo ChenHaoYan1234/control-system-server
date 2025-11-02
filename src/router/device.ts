@@ -34,7 +34,7 @@ async function deviceGet(ctx: Context, next: MiddlewareType) {
 async function deviceNameGet(ctx: Context, next: MiddlewareType) {
     // 打印请求日志，显示访问的设备UUID
     console.log(`GET /device/${ctx.params.deviceUUID}`)
-    if (isAvailableUUID(ctx.params.deviceUUID)) {
+    if (!isAvailableUUID(ctx.params.deviceUUID)) {
         // 如果设备UUID无效，返回400状态码和错误信息
         ctx.response.status = 400
         ctx.response.body = { message: "deviceUUID is invalid" }
