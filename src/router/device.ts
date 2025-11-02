@@ -1,6 +1,7 @@
 import type { Context } from "koa";
 import type { DeviceDataGetResponse, DeviceDataPostBody, DeviceDataPutBody, MiddlewareType } from "./type.d.ts";
 import { createDevice, getDeviceNameByUUID, getDevices, isAvailableDevice, updateDeviceName } from "../database.ts";
+import { isAvailableUUID } from "../utils.ts";
 
 /**
  * 处理获取设备列表的异步中间件函数
@@ -24,28 +25,45 @@ async function deviceGet(ctx: Context, next: MiddlewareType) {
     await next()  // 执行下一个中间件
 }
 
+
+/**
+ * 根据设备UUID获取设备名称的异步处理函数
+ * @param ctx - 上下文对象，包含请求和响应信息
+ * @param next - 中间件函数，用于传递控制权到下一个中间件
+ */
 async function deviceNameGet(ctx: Context, next: MiddlewareType) {
+    // 打印请求日志，显示访问的设备UUID
     console.log(`GET /device/${ctx.params.deviceUUID}`)
-    if (!isAvailableDevice(ctx.params.deviceUUID)) {
+    if (isAvailableUUID(ctx.params.deviceUUID)) {
+        // 如果设备UUID无效，返回400状态码和错误信息
+        ctx.response.status = 400
+        ctx.response.body = { message: "deviceUUID is invalid" }
+    } else if (!isAvailableDevice(ctx.params.deviceUUID)) {
+        // 如果设备不可用，返回404状态码和错误信息
         ctx.response.status = 404
         ctx.response.body = {
             message: "deviceUUID not found"
         }
     } else {
-        const device = await getDeviceNameByUUID(ctx.params.deviceUUID)
+        // 将UUID转换为小写后查询设备名称
+        const device = await getDeviceNameByUUID(ctx.params.deviceUUID.toLowerCase())
         if (!device) {
+            // 如果查询不到设备，返回404状态码和错误信息
             ctx.response.status = 404
             ctx.response.body = {
                 message: "deviceUUID not found"
             }
         } else {
+            // 查询成功，返回200状态码和设备信息
             ctx.response.status = 200
             ctx.response.body = {
                 deviceUUID: device.deviceUUID,
+                // 如果设备名称存在则返回名称，否则返回UUID
                 deviceName: device.deviceName ? device.deviceName : device.deviceUUID
             }
         }
     }
+    // 执行下一个中间件
     await next()
 }
 
@@ -59,6 +77,7 @@ async function devicePost(ctx: Context, next: MiddlewareType) {
     console.log("POST /device")
     // 获取请求体并转换为DeviceDataPostBody类型
     const body = ctx.request.body as DeviceDataPostBody
+    body.deviceUUID = body.deviceUUID.toLowerCase()
     // 检查deviceUUID是否存在或为空
     if (!body.deviceUUID) {
         // 如果deviceUUID不存在或为空，返回400错误状态码
@@ -67,6 +86,10 @@ async function devicePost(ctx: Context, next: MiddlewareType) {
         ctx.response.body = {
             message: "deviceUUID is required"
         }
+    } else if (!isAvailableUUID(body.deviceUUID)) {
+        // 如果deviceUUID格式不正确，返回400错误状态码
+        ctx.response.status = 400
+        ctx.response.body = { message: "deviceUUID is invalid" }
     } else if (isAvailableDevice(body.deviceUUID)) {
         ctx.response.status = 409
         ctx.response.body = {
@@ -74,6 +97,7 @@ async function devicePost(ctx: Context, next: MiddlewareType) {
         }
     } else {
         // 如果deviceUUID有效，则创建设备
+        body.deviceUUID = body.deviceUUID.toLowerCase()
         await createDevice(body)
         // 返回201状态码表示资源创建成功
         ctx.response.status = 201

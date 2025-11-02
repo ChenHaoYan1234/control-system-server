@@ -26,4 +26,8 @@ function buildEnvData(body: EnvDataPostBody): EnvDataType {
     return envdata
 }
 
-export { getLastOneHour, buildEnvData };
+function isAvailableUUID(uuid: string) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uuid);
+}
+
+export { getLastOneHour, buildEnvData, isAvailableUUID };

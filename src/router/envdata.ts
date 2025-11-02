@@ -1,7 +1,7 @@
 import type { Context } from "koa"
 import type { MiddlewareType, EnvDataPostBody } from "./type.d.ts"
 import { createEnvData, getLastOneHourEnvDatas, isAvailableDevice } from "../database.ts"
-import { buildEnvData } from "../utils.ts"
+import { buildEnvData, isAvailableUUID } from "../utils.ts"
 
 /**
  * 获取环境数据的异步处理函数
@@ -16,14 +16,19 @@ async function envdataGet(ctx: Context, next: MiddlewareType) {
         // 如果参数无效，返回400状态码和错误信息，表示客户端请求错误
         ctx.response.status = 400
         ctx.response.body = { error: "deviceUUID is required" }
-    } else if (!isAvailableDevice(ctx.query.deviceUUID as string)) {
+    }
+    else if (!isAvailableUUID((ctx.query.deviceUUID as string).toLowerCase())) {
+        // 如果deviceUUID格式不正确，返回400状态码和错误信息，表示客户端请求错误
+        ctx.response.status = 400
+        ctx.response.body = { error: "deviceUUID is invalid" }
+    } else if (!isAvailableDevice((ctx.query.deviceUUID as string).toLowerCase())) {
         // 如果设备UUID不存在，返回404状态码和错误信息，表示资源未找到
         ctx.response.status = 404
         ctx.response.body = { error: "deviceUUID is not found" }
     } else {
         // 参数有效且设备存在，返回200状态码和最近一小时的环境数据
         ctx.response.status = 200
-        ctx.response.body = await getLastOneHourEnvDatas(ctx.query.deviceUUID as string)
+        ctx.response.body = await getLastOneHourEnvDatas((ctx.query.deviceUUID as string).toLowerCase())
     }
     // 执行下一个中间件函数，完成请求处理流程
     await next()
@@ -44,7 +49,12 @@ async function envdataPost(ctx: Context, next: MiddlewareType) {
         // 如果deviceUUID不存在，返回400错误，表示请求缺少必要参数
         ctx.response.status = 400
         ctx.response.body = { error: "deviceUUID is required" }
-    } else if (!isAvailableDevice(body.deviceUUID)) {
+    } else if (!isAvailableUUID(body.deviceUUID.toLowerCase())) {
+        // 如果deviceUUID格式不正确，返回400错误，表示请求参数无效
+        ctx.response.status = 400
+        ctx.response.body = { error: "deviceUUID is invalid" }
+    }
+    else if (!isAvailableDevice(body.deviceUUID.toLowerCase())) {
         // 如果deviceUUID不存在于可用设备列表中，返回404错误，表示设备未找到
         ctx.response.status = 404
         ctx.response.body = { error: "deviceUUID is not found" }
@@ -57,7 +67,7 @@ async function envdataPost(ctx: Context, next: MiddlewareType) {
         const envdata = buildEnvData(body)
         try {
             // 将环境数据保存到数据库，使用deviceUUID关联设备
-            await createEnvData(envdata, body.deviceUUID)
+            await createEnvData(envdata, body.deviceUUID.toLowerCase())
             // 返回201状态码，表示资源创建成功
             ctx.response.status = 201
             ctx.response.body = { message: "ok" }
