@@ -5,7 +5,9 @@ import { deviceGet, deviceNameGet, devicePost, devicePut } from "./device.ts"
 /**
  * 创建一个新的路由实例
  */
-const router = new Router()
+const router = new Router({
+    prefix: "/api" // 设置路由前缀为/api
+})
 
 router.get("/envdata", envdataGet) // 路由配置：GET请求到/envdata路径，使用envdataGet处理函数
 router.post("/envdata", envdataPost) // 路由配置：POST请求到/envdata路径，使用envdataPost处理函数
