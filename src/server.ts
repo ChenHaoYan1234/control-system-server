@@ -23,6 +23,11 @@ app.use(cors({
 // 使用 bodyParser 中间件解析请求体
 app.use(bodyParser())
 
+app.use(async (ctx, next) => {
+    console.log(`Request: ${ctx.method} ${ctx.url}`)
+    await next()
+})
+
 // 注册路由中间件
 app.use(router.routes())
 // 允许所有 HTTP 方法的请求
