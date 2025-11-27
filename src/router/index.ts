@@ -6,7 +6,7 @@ import { deviceGet, deviceNameGet, devicePost, devicePut } from "./device.ts"
  * 创建一个新的路由实例
  */
 const router = new Router({
-    prefix: "/api" // 设置路由的基础路径为/api
+    prefix: "/" // 设置路由的基础路径为/
 })
 
 router.get("/envdata", envdataGet) // 路由配置：GET请求到/envdata路径，使用envdataGet处理函数
