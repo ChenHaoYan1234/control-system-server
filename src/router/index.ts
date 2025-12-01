@@ -2,12 +2,13 @@ import Router from "@koa/router"
 import { envdataGet, envdataPost } from "./envdata.ts"
 import { deviceGet, deviceNameGet, devicePost, devicePut } from "./device.ts"
 import { timestampGet } from "./timestamp.ts"
+import { server_config } from "../config.ts"
 
 /**
  * 创建一个新的路由实例
  */
 const router = new Router({
-    prefix: "/api" // 设置路由前缀为/api
+    prefix: server_config.api_prefix // 设置路由前缀
 })
 
 router.get("/envdata", envdataGet) // 路由配置：GET请求到/envdata路径，使用envdataGet处理函数
