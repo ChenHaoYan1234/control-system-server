@@ -91,6 +91,7 @@ async function devicePost(ctx: Context, next: MiddlewareType) {
         ctx.response.status = 400
         ctx.response.body = { message: "deviceUUID is invalid" }
     } else if (isAvailableDevice(body.deviceUUID)) {
+        // 如果deviceUUID已存在，返回409错误状态码
         ctx.response.status = 409
         ctx.response.body = {
             message: "deviceUUID is already in use"
