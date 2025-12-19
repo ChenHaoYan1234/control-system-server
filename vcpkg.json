@@ -1,0 +1,7 @@
+{
+  "name": "control-system-server",
+  "dependencies": [
+    "cpp-httplib",
+    "mongo-cxx-driver"
+  ]
+}
