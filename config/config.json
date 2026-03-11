@@ -1,0 +1,12 @@
+{
+    "server": {
+        "port": 8080
+    },
+    "database": {
+        "url": "mongodb://localhost:27017",
+        "user": "amdin",
+        "password": "admin",
+        "db_name": "test",
+        "auth_source": "admin"
+    }
+}
