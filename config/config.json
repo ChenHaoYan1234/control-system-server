@@ -3,7 +3,9 @@
         "port": 8080
     },
     "database": {
-        "url": "mongodb://localhost:27017",
+        "protocol": "mongodb",
+        "host": "localhost",
+        "port": 27017,
         "user": "amdin",
         "password": "admin",
         "db_name": "test",
