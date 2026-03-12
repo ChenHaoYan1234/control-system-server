@@ -10,7 +10,7 @@
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/target/debug/control-system-server",
-            "args": ["${workspaceFolder}/config/config.json"],
+            "args": ["${workspaceFolder}/test/config.json"],
             "preLaunchTask": "rust: cargo build"
         }
     ]
