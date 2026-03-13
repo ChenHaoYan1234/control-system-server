@@ -7,6 +7,8 @@ use crate::error::ConfigError;
 // 导入必要的序列化和反序列化特性，以及Debug特性用于调试输出
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ServerConfig {
+    // 服务器主机名，使用字符串表示
+    pub host: String,
     // 服务器端口号，使用无符号16位整数
     pub port: u16,
     // CORS跨域资源共享的来源，使用Option<String>表示可能不存在
