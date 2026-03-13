@@ -8,7 +8,7 @@
         "port": 27017,
         "user": "amdin",
         "password": "admin",
-        "db_name": "test",
+        "db_name": "env_data",
         "auth_source": "admin"
     }
 }

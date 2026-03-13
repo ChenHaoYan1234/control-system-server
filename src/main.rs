@@ -1,12 +1,17 @@
 use std::{env, path::Path};
 
-use actix_web::{App, HttpServer};
+use actix_web::{App, HttpServer, web};
 
-use crate::config::{CONFIG, Config};
+use crate::{
+    config::{CONFIG, Config},
+    database::models::{DeviceData, EnvData},
+    route::states::AppStates,
+};
 
 mod config;
 mod database;
 mod error;
+mod route;
 
 #[actix_web::main]
 // 这是一个异步主函数，用于启动应用程序并加载配置
@@ -38,9 +43,17 @@ async fn main() -> std::io::Result<()> {
     let config = &CONFIG.get().unwrap().server;
 
     // 创建数据库连接
-    database::db::create_connection().await;
+    let db = database::db::create_connection().await;
 
-    HttpServer::new(|| App::new())
+    let env_data = db.collection::<EnvData>("env_data");
+    let device_data = db.collection::<DeviceData>("device_data");
+
+    let appstates = AppStates {
+        env_data,
+        device_data,
+    };
+
+    HttpServer::new(move || App::new().app_data(web::Data::new(appstates.clone())))
         .bind((config.host.clone(), config.port))?
         .run()
         .await
