@@ -23,15 +23,21 @@ pub async fn create_connection() -> Database {
         }
     };
 
+    // 设置MongoDB客户端的应用名称，使用配置中的数据库名称
     client_options.app_name = Some(config.db_name.clone());
 
+    // 尝试使用指定的选项创建MongoDB客户端
+    // 使用match表达式处理可能出现的错误
     let client = match Client::with_options(client_options) {
+        // 如果客户端创建成功，将client变量绑定到创建的客户端实例
         Ok(client) => client,
+        // 如果创建失败，打印错误信息并退出程序
         Err(e) => {
             eprintln!("Failed to connect to MongoDB: {}", e);
             std::process::exit(1);
         }
     };
 
+    // 返回指定名称的数据库引用，使用配置中的数据库名称
     client.database(&config.db_name)
 }

@@ -45,15 +45,20 @@ async fn main() -> std::io::Result<()> {
     // 创建数据库连接
     let db = database::db::create_connection().await;
 
+    // 从数据库获取两个集合：环境数据集合和设备数据集合
     let env_data = db.collection::<EnvData>("env_data");
     let device_data = db.collection::<DeviceData>("device_data");
 
+    // 创建应用状态实例，包含环境数据和设备数据集合
     let appstates = AppStates {
         env_data,
         device_data,
     };
 
+    // 创建HTTP服务器，配置应用数据并启动服务
+    // 使用move闭包捕获appstates，使其在服务器生命周期内可用
     HttpServer::new(move || App::new().app_data(web::Data::new(appstates.clone())))
+        // 绑定配置的主机和端口
         .bind((config.host.clone(), config.port))?
         .run()
         .await
