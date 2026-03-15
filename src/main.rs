@@ -59,7 +59,15 @@ async fn main() -> std::io::Result<()> {
     // 创建HTTP服务器，配置应用数据并启动服务
     // 使用move闭包捕获appstates，使其在服务器生命周期内可用
     HttpServer::new(move || {
-        let cors = Cors::default().allowed_origin(config.cors_origin.as_ref().unwrap().as_str());
+        let cors = match config.cors_origin.as_ref() {
+            Some(cors_origin) => Cors::default()
+                .allowed_origin(cors_origin)
+                .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
+                .allow_any_header()
+                .supports_credentials()
+                .max_age(3600),
+            None => Cors::default(),
+        };
 
         App::new()
             .wrap(cors)
