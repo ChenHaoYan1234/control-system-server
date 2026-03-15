@@ -1,5 +1,6 @@
 use std::{env, path::Path};
 
+use actix_cors::Cors;
 use actix_web::{App, HttpServer, web};
 
 use crate::{
@@ -57,9 +58,15 @@ async fn main() -> std::io::Result<()> {
 
     // 创建HTTP服务器，配置应用数据并启动服务
     // 使用move闭包捕获appstates，使其在服务器生命周期内可用
-    HttpServer::new(move || App::new().app_data(web::Data::new(appstates.clone())))
-        // 绑定配置的主机和端口
-        .bind((config.host.clone(), config.port))?
-        .run()
-        .await
+    HttpServer::new(move || {
+        let cors = Cors::default().allowed_origin(config.cors_origin.as_ref().unwrap().as_str());
+
+        App::new()
+            .wrap(cors)
+            .app_data(web::Data::new(appstates.clone()))
+    })
+    // 绑定配置的主机和端口
+    .bind((config.host.clone(), config.port))?
+    .run()
+    .await
 }
