@@ -5,8 +5,7 @@ use actix_web::{App, HttpServer, web};
 
 use crate::{
     config::{CONFIG, Config},
-    database::models::{DeviceData, EnvData},
-    route::states::AppStates,
+    database::models::{DeviceData, EnvData}
 };
 
 mod config;
@@ -51,7 +50,7 @@ async fn main() -> std::io::Result<()> {
     let device_data = db.collection::<DeviceData>("device_data");
 
     // 创建应用状态实例，包含环境数据和设备数据集合
-    let appstates = AppStates {
+    let appstates = route::states::AppStates {
         env_data,
         device_data,
     };
@@ -71,8 +70,10 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .wrap(cors)
+            .service(web::scope("/timestamp").configure(route::timestamp::timestamp))
             .app_data(web::Data::new(appstates.clone()))
     })
+    .workers(4)
     // 绑定配置的主机和端口
     .bind((config.host.clone(), config.port))?
     .run()
