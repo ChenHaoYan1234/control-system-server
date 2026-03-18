@@ -7,7 +7,8 @@ import type { MiddlewareType } from "./type.js";
  * @param next - 下一个中间件函数
  */
 async function timestampGet(ctx: Context, next: MiddlewareType) {
-    ctx.body = {
+    ctx.response.status = 200
+    ctx.response.body = {
         timestamp: Date.now() / 1000 // 转换为秒
     }
     await next()
