@@ -57,6 +57,4 @@ impl Config {
 }
 
 // 全局静态变量，用于存储配置信息
-// 使用Option<Config>表示配置可能不存在
-// 使用unsafe关键字表示访问此变量需要unsafe代码块
 pub static CONFIG: OnceLock<Config> = OnceLock::new();

@@ -1,11 +1,13 @@
 use std::{env, path::Path};
 
 use actix_cors::Cors;
-use actix_web::{App, HttpServer, web};
+use actix_web::{App, HttpServer, middleware::Logger, web};
+use env_logger::Env;
+use log::{error, info};
 
 use crate::{
     config::{CONFIG, Config},
-    database::models::{DeviceData, EnvData}
+    database::models::{DeviceData, EnvData},
 };
 
 mod config;
@@ -16,6 +18,8 @@ mod route;
 #[actix_web::main]
 // 这是一个异步主函数，用于启动应用程序并加载配置
 async fn main() -> std::io::Result<()> {
+    env_logger::init_from_env(Env::default().default_filter_or("info"));
+
     // 收集命令行参数到一个字符串向量中
     let args: Vec<String> = env::args().collect();
     // 使用第一个命令行参数作为配置文件的路径
@@ -27,14 +31,16 @@ async fn main() -> std::io::Result<()> {
             // 将加载的配置设置为全局配置
             CONFIG.get_or_init(|| config);
             // 打印成功消息
-            println!("Config loaded successfully");
-            // 打印加载的配置内容
-            println!("Config: {:?}", CONFIG.get().unwrap());
+            info!("Config loaded successfully");
+            if cfg!(debug_assertions) {
+                // 打印加载的配置内容
+                info!("Config: {:?}", CONFIG.get().unwrap());
+            }
         }
         // 如果配置加载失败
         Err(e) => {
-            // 打印错误信息到标准错误输出
-            eprintln!("Error loading config file: {}", e);
+            // 打印错误信息
+            error!("Error loading config file: {}", e);
             // 以非零状态码退出程序，表示错误
             std::process::exit(1);
         }
@@ -70,8 +76,9 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .wrap(cors)
-            .service(web::scope("/timestamp").configure(route::timestamp::timestamp))
+            .wrap(Logger::default())
             .app_data(web::Data::new(appstates.clone()))
+            .service(web::scope("/timestamp").configure(route::timestamp::timestamp))
     })
     .workers(4)
     // 绑定配置的主机和端口

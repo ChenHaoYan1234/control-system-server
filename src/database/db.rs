@@ -1,3 +1,4 @@
+use log::error;
 use mongodb::{Client, Database, options::ClientOptions};
 
 use crate::config::CONFIG;
@@ -18,7 +19,7 @@ pub async fn create_connection() -> Database {
     let mut client_options = match ClientOptions::parse(url).await {
         Ok(client_options) => client_options,
         Err(e) => {
-            eprintln!("Failed to parse MongoDB connection string: {}", e);
+            error!("Failed to parse MongoDB connection string: {}", e);
             std::process::exit(1);
         }
     };
@@ -33,7 +34,7 @@ pub async fn create_connection() -> Database {
         Ok(client) => client,
         // 如果创建失败，打印错误信息并退出程序
         Err(e) => {
-            eprintln!("Failed to connect to MongoDB: {}", e);
+            error!("Failed to connect to MongoDB: {}", e);
             std::process::exit(1);
         }
     };
