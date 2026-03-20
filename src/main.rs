@@ -4,6 +4,7 @@ use actix_cors::Cors;
 use actix_web::{App, HttpServer, middleware::Logger, web};
 use env_logger::Env;
 use log::{error, info};
+use mongodb::bson::doc;
 
 use crate::{
     config::{CONFIG, Config},
@@ -50,6 +51,16 @@ async fn main() -> std::io::Result<()> {
 
     // 创建数据库连接
     let db = database::db::create_connection().await;
+
+    match db.run_command(doc! {"ping": 1}).await {
+        Ok(result) => {
+            info!("Connected to MongoDB: {}", result);
+        }
+        Err(e) => {
+            error!("Failed to connect to MongoDB: {}", e);
+            std::process::exit(1);
+        }
+    };
 
     // 从数据库获取两个集合：环境数据集合和设备数据集合
     let env_data = db.collection::<EnvData>("env_data");
