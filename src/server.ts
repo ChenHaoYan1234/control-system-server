@@ -2,8 +2,16 @@ import Koa from "koa"
 import bodyParser from "@koa/bodyparser"
 import { createConnection, updateEnvDataModels } from "./database.ts"
 import router from "./router/index.ts"
-import { server_config } from "./config.ts"
+import { config, load_file } from "./config.ts"
 import cors from "@koa/cors"
+import http from "http"
+
+if (process.argv[2] != undefined) {
+    load_file(process.argv[2])
+} else {
+    console.error("Please specify the configuration file path.")
+    process.exit(1)
+}
 
 // 创建数据库连接
 await createConnection()
@@ -15,7 +23,7 @@ await updateEnvDataModels()
 const app = new Koa()
 
 app.use(cors({
-    origin: server_config.client.origin,
+    origin: config?.server.cors_origin,
     maxAge: 3600,
     credentials: true,
 }))
@@ -29,6 +37,6 @@ app.use(router.routes())
 app.use(router.allowedMethods())
 
 // 启动服务器，监听 8080 端口
-app.listen(server_config.port, () => {
-    console.log(`Server is running on http://localhost:${server_config.port}.`)
+http.createServer(app.callback()).listen(config?.server.port, config?.server.host, ()=>{
+    console.log(`Server is running at http://${config?.server.host}:${config?.server.port}`)
 })

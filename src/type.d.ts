@@ -20,6 +20,23 @@ declare type DeviceDataType = {
     deviceName?: string,   // 设备名称，可选字段
 }
 
+declare type ConfigType = {
+    server: {
+        host: string,
+        port: number,
+        cors_origin: string | undefined
+    },
+    database: {
+        protocol: string,
+        host: string,
+        port: number,
+        user: string,
+        password: string,
+        db_name: string,
+        auth_source: string,
+    }
+}
+
 /**
  * 环境数据模型类型接口
  * 使用索引签名定义一个字符串到Mongoose模型的映射
@@ -31,5 +48,6 @@ interface EnvDataModelsType {
 export {
     EnvDataType,
     DeviceDataType,
-    EnvDataModelsType
+    EnvDataModelsType,
+    ConfigType
 }
