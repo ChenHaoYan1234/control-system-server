@@ -1,7 +1,8 @@
+use futures_util::TryStreamExt;
 use log::error;
-use mongodb::{Client, Database, options::ClientOptions};
+use mongodb::{Client, Collection, Database, bson::doc, options::ClientOptions};
 
-use crate::config::CONFIG;
+use crate::{config::CONFIG, database::models::DeviceData};
 
 /// 创建MongoDB数据库连接的异步函数
 /// 该函数根据配置信息构建连接字符串并尝试建立连接
@@ -41,4 +42,16 @@ pub async fn create_connection() -> Database {
 
     // 返回指定名称的数据库引用，使用配置中的数据库名称
     client.database(&config.db_name)
+}
+
+pub async fn get_devices(device_collection: &Collection<DeviceData>) -> Vec<DeviceData> {
+    let mut cursor = device_collection.find(doc! {}).await.unwrap();
+    let mut devices = Vec::new();
+    while let Ok(doc) = cursor.try_next().await {
+        match doc {
+            Some(device) => devices.push(device),
+            None => break,
+        }
+    }
+    devices
 }
