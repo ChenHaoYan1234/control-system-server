@@ -1,7 +1,7 @@
 use std::{env, path::Path};
 
 use actix_cors::Cors;
-use actix_web::{App, HttpServer, middleware::Logger, web};
+use actix_web::{App, HttpServer, middleware, web};
 use env_logger::Env;
 use log::{error, info};
 use mongodb::bson::doc;
@@ -86,8 +86,9 @@ async fn main() -> std::io::Result<()> {
         };
 
         App::new()
+            .wrap(middleware::Compress::default())
             .wrap(cors)
-            .wrap(Logger::default())
+            .wrap(middleware::Logger::default())
             .app_data(web::Data::new(appstates.clone()))
             .service(web::scope("/timestamp").configure(route::timestamp::timestamp))
             .service(web::scope("/device").configure(route::device::device))
