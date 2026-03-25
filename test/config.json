@@ -7,9 +7,9 @@
         "protocol": "mongodb",
         "host": "localhost",
         "port": 27017,
-        "user": "amdin",
-        "password": "admin",
+        "user": "env_data",
+        "password": "env_data",
         "db_name": "env_data",
-        "auth_source": "admin"
+        "auth_source": "env_data"
     }
 }

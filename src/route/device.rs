@@ -6,7 +6,7 @@ async fn device_get(data: web::Data<AppStates>) -> impl Responder {
     let devices = get_devices(&data.device_data).await;
     let devices_json = serde_json::to_string(&devices).unwrap();
     HttpResponse::Ok().body(format!(
-        "{{\"message\": \"OK\", \"devices\": {}",
+        "{{\"message\": \"OK\", \"devices\": {}}}",
         devices_json
     ))
 }
