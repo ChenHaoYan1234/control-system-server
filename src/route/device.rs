@@ -25,7 +25,7 @@ async fn device_get_by_id(
             device.id,
             device.name.unwrap_or(device.id.clone())
         )),
-        None => HttpResponse::NotFound().body("{{message: \"deviceUUID not found\"}}"),
+        None => HttpResponse::NotFound().body("{message: \"deviceUUID not found\"}"),
     };
     response
 }
