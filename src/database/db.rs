@@ -55,3 +55,10 @@ pub async fn get_devices(device_collection: &Collection<DeviceData>) -> Vec<Devi
     }
     devices
 }
+
+pub async fn get_device_by_id(
+    device_collection: &Collection<DeviceData>,
+    uuid: &str,
+) -> Option<DeviceData> {
+    device_collection.find_one(doc! {"id": uuid}).await.ok()?
+}

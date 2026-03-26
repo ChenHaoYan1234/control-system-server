@@ -21,5 +21,5 @@ pub struct EnvData {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DeviceData {
     pub id: String,  // 设备ID，使用字符串类型
-    pub name: String, // 设备名称，使用字符串类型
+    pub name: Option<String>, // 设备名称，使用字符串类型
 }
