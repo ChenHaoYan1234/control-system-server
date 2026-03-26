@@ -13,6 +13,8 @@ pub struct ServerConfig {
     pub port: u16,
     // CORS跨域资源共享的来源，使用Option<String>表示可能不存在
     pub cors_origin: Option<String>,
+    // API 的前缀路径
+    pub api_prefix: Option<String>,
 }
 
 // 导入必要的序列化和反序列化特性，以及Debug特性用于调试输出
@@ -53,6 +55,16 @@ impl Config {
         let config: Config = serde_json::from_reader(f)?;
         // 返回解析后的配置
         Ok(config)
+    }
+}
+
+impl ServerConfig {
+    pub fn gen_prefix(&self, path: &str) -> String {
+        let result = match &self.api_prefix {
+            Some(prefix) => format!("/{}/{}", prefix, path),
+            None => path.to_string(),
+        };
+        result
     }
 }
 

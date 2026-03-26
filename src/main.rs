@@ -90,8 +90,8 @@ async fn main() -> std::io::Result<()> {
             .wrap(cors)
             .wrap(middleware::Logger::default())
             .app_data(web::Data::new(appstates.clone()))
-            .service(web::scope("/timestamp").configure(route::timestamp::timestamp))
-            .service(web::scope("/device").configure(route::device::device))
+            .service(web::scope(&config.gen_prefix("/timestamp")).configure(route::timestamp::timestamp))
+            .service(web::scope(&config.gen_prefix("/device")).configure(route::device::device))
     })
     .workers(4)
     // 绑定配置的主机和端口
