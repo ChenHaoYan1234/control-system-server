@@ -24,7 +24,8 @@ declare type ConfigType = {
     server: {
         host: string,
         port: number,
-        cors_origin: string | undefined
+        cors_origin: string | undefined,
+        api_prefix: string,
     },
     database: {
         protocol: string,
