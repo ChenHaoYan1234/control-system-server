@@ -1,4 +1,5 @@
 use actix_web::{HttpResponse, Responder, web};
+use uuid::Uuid;
 
 use crate::{
     database::db::{get_device_by_id, get_devices},
@@ -19,6 +20,9 @@ async fn device_get_by_id(
     data: web::Data<AppStates>,
 ) -> impl Responder {
     let uuid = path.into_inner().0;
+    if uuid.parse::<Uuid>().is_err() {
+        return HttpResponse::BadRequest().body("{\"message\": \"invalid device UUID\"}");
+    }
     let response = match get_device_by_id(&data.device_data, &uuid.to_lowercase()).await {
         Some(device) => HttpResponse::Ok().body(format!(
             "{{deviceUUID: \"{}\", deviceName: \"{}\"}}",
