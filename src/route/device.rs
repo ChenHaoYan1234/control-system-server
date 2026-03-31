@@ -23,15 +23,16 @@ async fn device_get_by_id(
     if uuid.parse::<Uuid>().is_err() {
         return HttpResponse::BadRequest().body("{\"message\": \"invalid device UUID\"}");
     }
-    let response = match get_device_by_id(&data.device_data, &uuid.to_lowercase()).await {
-        Some(device) => HttpResponse::Ok().body(format!(
-            "{{deviceUUID: \"{}\", deviceName: \"{}\"}}",
-            device.id,
-            device.name.unwrap_or(device.id.clone())
-        )),
-        None => HttpResponse::NotFound().body("{\"message\": \"device not found\"}"),
+    match get_device_by_id(&data.device_data, &uuid.to_lowercase()).await {
+        Some(device) => {
+            return HttpResponse::Ok().body(format!(
+                "{{\"deviceUUID\": \"{}\", \"deviceName\": \"{}\"}}",
+                device.id,
+                device.name.unwrap_or(device.id.clone())
+            ));
+        }
+        None => return HttpResponse::NotFound().body("{\"message\": \"device not found\"}"),
     };
-    response
 }
 
 pub fn device(cfg: &mut web::ServiceConfig) {
